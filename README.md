@@ -69,7 +69,10 @@ This system uses **two separate AI components**, each with a clear responsibilit
 ### 1️⃣ Create virtual environment
 
 python -m venv .fishbone_env
+
 source .fishbone_env/bin/activate  # Linux/Mac
+
+
 .fishbone_env\Scripts\activate     # Windows
 
 
