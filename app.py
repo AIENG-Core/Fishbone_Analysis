@@ -9,14 +9,7 @@ from ml.constants import FISHBONE
 # --------------------------------------------------
 # HIERARCHY OF CONTROLS MAPPING
 # --------------------------------------------------
-CONTROL_TYPE = {
-    "People": "Administrative Control",
-    "Process": "Engineering Control",
-    "Material": "Administrative Control",
-    "Measurement": "Administrative Control",
-    "Equipment": "Engineering Control",
-    "Environment": "Administrative Control"
-}
+
 
 # --------------------------------------------------
 # Page setup
@@ -56,7 +49,7 @@ if "ai" in st.session_state:
     # Causes + descriptions + Hierarchy label
     # =======================================
     with left:
-        st.subheader("🧠 Root Causes (Editable)")
+        st.subheader("Root Causes (Editable)")
 
         for category, items in st.session_state.ai.items():
 
@@ -163,7 +156,7 @@ if "ai" in st.session_state:
                 else:
                     administrative.append(f"- **{category}**: {item['cause']}")
 
-        st.markdown("### 🔧 Engineering Controls")
+        st.markdown("🔧 Engineering Controls")
         if engineering:
             st.markdown("\n".join(engineering))
         else:

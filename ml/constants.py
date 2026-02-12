@@ -1,31 +1,91 @@
 FISHBONE = {
     "People": [
         "Lack of Training",
-        "Inadequate Inspection",
-        "Poor Hazard Awareness"
+        "Inadequate Manpower",
+        "Improper Motivation",
+        "Lack of Experience",
+        "Human Factors",
+        "Eyes not on task",
+        "Inadequate Physical Capability",
+        "Fatigue",
+        "Drug or Alcohol Abuse",
+        "Mental Stress",
+        "Poor Judgement",
+        "Memory Failure",
+        "Poor Reaction Time",
+        "Vision Deficiency",
+        "Hearing Deficiency",
+        "Restricted body movement",
+        "Extreme Boredom",
+        "Aggression",
+        "Not using PPE",
+        "Incorrect Instructions"
     ],
+
     "Process": [
-        "No leak detection procedure",
-        "No isolation of electrical equipment",
-        "Poor maintenance process"
+        "Inadequate Management Review",
+        "Inadequate Operating Procedure",
+        "Inadequate Change Management",
+        "Inadequate Supervision",
+        "Inadequate hazard identification",
+        "Inadequate Assessment of Skills",
+        "Lack of Coaching",
+        "Lack of Training Need Identification",
+        "Inadequate Work Planning",
+        "Inadequate Horizontal Deployment of Learnings",
+        "Inadequate Display of Information",
+        "Inadequate Access Control",
+        "Inadequate Warning System"
     ],
+
     "Material": [
-        "Flammable liquid (low flash point)",
-        "Bund lining degradation"
+        "Makeshift Tool",
+        "Use of Damaged Tool",
+        "Damage / inadequate PPE",
+        "Improper Storage of Material",
+        "Incorrect part used in assembly",
+        "Inadequate Resources",
+        "Improper handling of Material",
+        "Inadequate Material Packaging",
+        "Incompatible Material"
     ],
+
     "Measurement": [
-        "No bund level alarm",
-        "No inspection tracking"
+        "Lack of performance monitoring",
+        "Poorly defined KPIs",
+        "Rewarding Improper Performance",
+        "Inadequate Contractor Performance Evaluation",
+        "Inadequate Performance Evaluation",
+        "Inadequate monitoring of performance"
     ],
+
     "Equipment": [
-        "Faulty electrical pump",
-        "Leaking storage vessel"
+        "Poor Quality",
+        "Lack of Preventive Maintenance",
+        "Use of Non-Calibrated Equipment",
+        "Use of Non-Certified Equipment",
+        "Improper Breakdown Maintenance",
+        "Bypass Safety Systems",
+        "Inadequate Equipment Design",
+        "Defective Equipment",
+        "Defective Safety Devices"
     ],
+
     "Environment": [
-        "Rainwater accumulation",
-        "Corrosion due to weather exposure"
+        "Poor Illumination",
+        "High Wind",
+        "Rain",
+        "Congested Workplace",
+        "Slippery Surface",
+        "High Temperature",
+        "High Noise",
+        "High Vibration",
+        "Inadequate Ventilation",
+        "Unprotected height",
+        "Exposure to Radiation"
     ]
 }
+
 
 THRESHOLDS = {
     "People": 0.38,

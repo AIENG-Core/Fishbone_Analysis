@@ -1,0 +1,17 @@
+The learning loop (simple & correct)
+
+
+Every incident goes through this cycle:
+AI suggests causes (based on similarity + current weights)
+Human edits (adds/removes causes, writes descriptions)
+Final RCA is saved
+
+Training step runs:
+Accepted causes → weight ↑
+
+Rejected causes → weight ↓
+
+Next incident uses updated weights
+This is continuous learning, safely.
+
+
