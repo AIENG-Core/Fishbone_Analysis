@@ -1,12 +1,17 @@
-# 
-# description_generator.py
 import ollama
-import asyncio
 from config import LLM_MODEL
+
 
 async def generate_descriptions_batch(incident, category, causes):
 
-    causes_text = "\n".join(f"- {c}" for c in causes)
+    # 🔴 Safety check
+    if isinstance(causes, str):
+        causes = [causes]
+
+    if not causes:
+        return []
+
+    causes_text = "\n".join(f"{i+1}. {c}" for i, c in enumerate(causes))
 
     prompt = f"""
 You are assisting in an industrial safety Root Cause Analysis.
@@ -26,21 +31,29 @@ Rules:
 - No blame
 - No assumptions
 - No new causes
-- Output as numbered list
+- Return numbered list only
 """
 
     response = ollama.generate(
         model=LLM_MODEL,
-        prompt=prompt
+        prompt=prompt,
+        options={"num_predict": 150}
     )
 
     text = response["response"].strip()
 
-    # Split numbered output
-    descriptions = [
-        line.split(".", 1)[-1].strip()
-        for line in text.split("\n")
-        if line.strip()
-    ]
+    # Parse numbered output safely
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
 
-    return descriptions
+    descriptions = []
+    for line in lines:
+        if "." in line:
+            descriptions.append(line.split(".", 1)[1].strip())
+        else:
+            descriptions.append(line)
+
+    # Ensure same length as causes
+    while len(descriptions) < len(causes):
+        descriptions.append("")
+
+    return descriptions[:len(causes)]

@@ -18,6 +18,16 @@ st.caption(
 )
 
 # --------------------------------------------------
+# Initialize session state
+# --------------------------------------------------
+if "ai" not in st.session_state:
+    st.session_state.ai = None
+
+if "final" not in st.session_state:
+    st.session_state.final = {}
+
+
+# --------------------------------------------------
 # Incident input
 # --------------------------------------------------
 incident = st.text_area(
@@ -33,15 +43,16 @@ if st.button("⚡ Generate Fishbone") and incident.strip():
     st.session_state.ai = asyncio.run(analyze(incident))
     st.session_state.final = {}
 
+
 # --------------------------------------------------
 # Display results
 # --------------------------------------------------
-if "ai" in st.session_state:
+if st.session_state.ai:
 
     left, right = st.columns([3, 2])
 
     # ================= LEFT =================
-    # Causes + descriptions (Editable)
+    # Editable causes
     # =======================================
     with left:
         st.subheader("🧠 Root Causes (Editable)")
@@ -50,31 +61,32 @@ if "ai" in st.session_state:
 
             st.markdown(f"### {category}")
 
-            st.session_state.final[category] = []
+            updated_items = []
 
-            for item in items:
+            for i, item in enumerate(items):
                 cause = item["cause"]
 
+                # ✅ UNIQUE KEYS using index
                 checked = st.checkbox(
                     cause,
                     value=True,
-                    key=f"{category}_{cause}"
+                    key=f"{category}_chk_{i}"
                 )
 
                 desc = st.text_area(
                     "Description",
                     value=item["description"],
-                    key=f"{category}_{cause}_desc"
+                    key=f"{category}_desc_{i}"
                 )
 
                 if checked:
-                    st.session_state.final[category].append({
+                    updated_items.append({
                         "cause": cause,
                         "description": desc
                     })
 
             # -------- Manual add dropdown --------
-            existing = {i["cause"] for i in st.session_state.final[category]}
+            existing = {i["cause"] for i in updated_items}
             remaining = [c for c in FISHBONE[category] if c not in existing]
 
             new_cause = st.selectbox(
@@ -84,14 +96,17 @@ if "ai" in st.session_state:
             )
 
             if new_cause != "-- Select --":
-                st.session_state.final[category].append({
+                updated_items.append({
                     "cause": new_cause,
                     "description": ""
                 })
 
+            # Save updated category state
+            st.session_state.final[category] = updated_items
+
             st.divider()
 
-        # Save & train
+        # -------- Save & Train --------
         if st.button("💾 Save RCA & Train Model"):
             train(
                 st.session_state.ai,
@@ -102,8 +117,9 @@ if "ai" in st.session_state:
             )
             st.success("RCA saved. Model learned from this incident.")
 
+
     # ================= RIGHT =================
-    # Fishbone diagram
+    # Fishbone Diagram
     # ========================================
     with right:
         st.subheader("📊 Fishbone Diagram")
@@ -122,8 +138,8 @@ if "ai" in st.session_state:
             dot.node(category, category)
             dot.edge(category, "Effect")
 
-            for item in items:
-                node_id = f"{category}_{item['cause']}"
+            for i, item in enumerate(items):
+                node_id = f"{category}_{i}"
                 dot.node(node_id, item["cause"])
                 dot.edge(node_id, category)
 
@@ -133,6 +149,6 @@ if "ai" in st.session_state:
 # --------------------------------------------------
 # Output preview
 # --------------------------------------------------
-if "final" in st.session_state:
+if st.session_state.final:
     st.subheader("✅ Final RCA Output (Preview)")
     st.json(st.session_state.final)
