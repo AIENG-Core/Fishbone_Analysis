@@ -1,11 +1,13 @@
-#description_generator.py
+# 
+# description_generator.py
 import ollama
 import asyncio
-from config import LLM_MODEL, MAX_LLM_CONCURRENCY
+from config import LLM_MODEL
 
-_semaphore = asyncio.Semaphore(MAX_LLM_CONCURRENCY)
+async def generate_descriptions_batch(incident, category, causes):
 
-async def generate_description(incident, category, cause):
+    causes_text = "\n".join(f"- {c}" for c in causes)
+
     prompt = f"""
 You are assisting in an industrial safety Root Cause Analysis.
 
@@ -13,21 +15,32 @@ Incident:
 {incident}
 
 Category: {category}
-Cause: {cause}
 
-Write a short, neutral description of this cause in the context
-of the incident.
+Causes:
+{causes_text}
+
+Write a short neutral description (1 to 2 sentences)
+for EACH cause in order.
 
 Rules:
 - No blame
 - No assumptions
 - No new causes
-- 2 to 3 sentences max
+- Output as numbered list
 """
 
-    async with _semaphore:
-        response = ollama.generate(
-            model=LLM_MODEL,
-            prompt=prompt
-        )
-        return response["response"].strip()
+    response = ollama.generate(
+        model=LLM_MODEL,
+        prompt=prompt
+    )
+
+    text = response["response"].strip()
+
+    # Split numbered output
+    descriptions = [
+        line.split(".", 1)[-1].strip()
+        for line in text.split("\n")
+        if line.strip()
+    ]
+
+    return descriptions
