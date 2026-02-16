@@ -6,10 +6,6 @@ from ml.inference import analyze
 from ml.training import train
 from ml.constants import FISHBONE
 
-# --------------------------------------------------
-# HIERARCHY OF CONTROLS MAPPING
-# --------------------------------------------------
-
 
 # --------------------------------------------------
 # Page setup
@@ -18,8 +14,7 @@ st.set_page_config(layout="wide")
 st.title("🐟 Fishbone RCA AI (Learning System)")
 st.caption(
     "AI suggests causes & descriptions. "
-    "Categories are mapped to Hierarchy of Controls. "
-    "System learns on save."
+    "Edit selections and save to train the system."
 )
 
 # --------------------------------------------------
@@ -46,16 +41,14 @@ if "ai" in st.session_state:
     left, right = st.columns([3, 2])
 
     # ================= LEFT =================
-    # Causes + descriptions + Hierarchy label
+    # Causes + descriptions (Editable)
     # =======================================
     with left:
-        st.subheader("Root Causes (Editable)")
+        st.subheader("🧠 Root Causes (Editable)")
 
         for category, items in st.session_state.ai.items():
 
-            st.markdown(
-                f"### {category} — **{CONTROL_TYPE[category]}**"
-            )
+            st.markdown(f"### {category}")
 
             st.session_state.final[category] = []
 
@@ -107,12 +100,10 @@ if "ai" in st.session_state:
                     for cat, items in st.session_state.final.items()
                 }
             )
-            st.success(
-                "RCA saved. Model learned from this incident."
-            )
+            st.success("RCA saved. Model learned from this incident.")
 
     # ================= RIGHT =================
-    # Fishbone diagram + Summary Panel
+    # Fishbone diagram
     # ========================================
     with right:
         st.subheader("📊 Fishbone Diagram")
@@ -128,10 +119,7 @@ if "ai" in st.session_state:
             if not items:
                 continue
 
-            dot.node(
-                category,
-                f"{category}\n({CONTROL_TYPE[category]})"
-            )
+            dot.node(category, category)
             dot.edge(category, "Effect")
 
             for item in items:
@@ -141,35 +129,9 @@ if "ai" in st.session_state:
 
         st.graphviz_chart(dot)
 
-        # --------------------------------------------------
-        # NEW: Hierarchy of Controls Summary Panel
-        # --------------------------------------------------
-        st.subheader("🛡️ Hierarchy of Controls Summary")
-
-        engineering = []
-        administrative = []
-
-        for category, items in st.session_state.final.items():
-            for item in items:
-                if CONTROL_TYPE[category] == "Engineering Control":
-                    engineering.append(f"- **{category}**: {item['cause']}")
-                else:
-                    administrative.append(f"- **{category}**: {item['cause']}")
-
-        st.markdown("🔧 Engineering Controls")
-        if engineering:
-            st.markdown("\n".join(engineering))
-        else:
-            st.info("No engineering controls selected yet.")
-
-        st.markdown("### 📋 Administrative Controls")
-        if administrative:
-            st.markdown("\n".join(administrative))
-        else:
-            st.info("No administrative controls selected yet.")
 
 # --------------------------------------------------
-# Output preview (optional)
+# Output preview
 # --------------------------------------------------
 if "final" in st.session_state:
     st.subheader("✅ Final RCA Output (Preview)")

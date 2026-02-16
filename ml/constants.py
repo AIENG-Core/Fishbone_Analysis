@@ -1,25 +1,16 @@
+#constants.py
 FISHBONE = {
     "People": [
-        "Lack of Training",
-        "Inadequate Manpower",
-        "Improper Motivation",
-        "Lack of Experience",
-        "Human Factors",
-        "Eyes not on task",
-        "Inadequate Physical Capability",
-        "Fatigue",
-        "Drug or Alcohol Abuse",
-        "Mental Stress",
-        "Poor Judgement",
-        "Memory Failure",
-        "Poor Reaction Time",
-        "Vision Deficiency",
-        "Hearing Deficiency",
-        "Restricted body movement",
-        "Extreme Boredom",
-        "Aggression",
-        "Not using PPE",
-        "Incorrect Instructions"
+        "Lack of Training", "Inadequate Manpower",
+        "Improper Motivation", "Lack of Experience",
+        "Human Factors", "Eyes not on task",
+        "Inadequate Physical Capability", "Fatigue",
+        "Drug or Alcohol Abuse", "Mental Stress",
+        "Poor Judgement", "Memory Failure",
+        "Poor Reaction Time", "Vision Deficiency",
+        "Hearing Deficiency", "Restricted body movement",
+        "Extreme Boredom", "Aggression",
+        "Not using PPE", "Incorrect Instructions"
     ],
 
     "Process": [
@@ -39,8 +30,7 @@ FISHBONE = {
     ],
 
     "Material": [
-        "Makeshift Tool",
-        "Use of Damaged Tool",
+        "Makeshift Tool", "Use of Damaged Tool",
         "Damage / inadequate PPE",
         "Improper Storage of Material",
         "Incorrect part used in assembly",
@@ -72,17 +62,11 @@ FISHBONE = {
     ],
 
     "Environment": [
-        "Poor Illumination",
-        "High Wind",
-        "Rain",
-        "Congested Workplace",
-        "Slippery Surface",
-        "High Temperature",
-        "High Noise",
-        "High Vibration",
-        "Inadequate Ventilation",
-        "Unprotected height",
-        "Exposure to Radiation"
+        "Poor Illumination", "High Wind", "Rain",
+        "Congested Workplace", "Slippery Surface",
+        "High Temperature", "High Noise",
+        "High Vibration", "Inadequate Ventilation",
+        "Unprotected height", "Exposure to Radiation"
     ]
 }
 

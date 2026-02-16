@@ -1,3 +1,4 @@
+#description_generator.py
 import ollama
 import asyncio
 from config import LLM_MODEL, MAX_LLM_CONCURRENCY
@@ -14,8 +15,8 @@ Incident:
 Category: {category}
 Cause: {cause}
 
-Write a short, neutral, factual explanation of how this cause contributed
-to the incident.
+Write a short, neutral description of this cause in the context
+of the incident.
 
 Rules:
 - No blame
