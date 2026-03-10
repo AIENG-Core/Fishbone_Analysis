@@ -1,41 +1,45 @@
-import asyncio
 from sklearn.metrics.pairwise import cosine_similarity
 
 from models.embeddings import EmbeddingModel
 from models.relevance_model import RelevanceModel
-from ml.constants import FISHBONE, THRESHOLDS
+
+from ml.constants import FISHBONE
 from ml.description_generator import generate_descriptions_batch
+
+from config import MAX_CAUSES_PER_CATEGORY, MIN_SIMILARITY_SCORE
 
 
 embedder = EmbeddingModel()
 relevance = RelevanceModel()
 
 
-# --------------------------------------------------
-# Pre-encode all causes WITH category context
-# --------------------------------------------------
-CAUSE_EMBEDDINGS = {
-    cat: {
-        cause: embedder.encode(f"{cat}. Root cause: {cause}")
-        for cause in causes
-    }
-    for cat, causes in FISHBONE.items()
-}
+# Precompute embeddings
+CAUSE_EMBEDDINGS = {}
+
+for category, causes in FISHBONE.items():
+
+    CAUSE_EMBEDDINGS[category] = {}
+
+    for cause in causes:
+
+        text = (
+            f"{category} root cause: {cause}. "
+            f"This cause can contribute to industrial incidents."
+        )
+
+        CAUSE_EMBEDDINGS[category][cause] = embedder.encode(text)
 
 
-# --------------------------------------------------
-# Main analysis function
-# --------------------------------------------------
 async def analyze(incident_text: str):
 
     incident_emb = embedder.encode(incident_text)
-    result = {}
+
+    selected_causes = []
 
     for category, causes in FISHBONE.items():
 
-        selected_causes = []
+        scores = []
 
-        # -------- Similarity filtering --------
         for cause in causes:
 
             cause_emb = CAUSE_EMBEDDINGS[category][cause]
@@ -47,29 +51,53 @@ async def analyze(incident_text: str):
 
             score = relevance.score(sim, cause)
 
-            if score >= THRESHOLDS[category]:
-                selected_causes.append(cause)
+            scores.append((cause, score))
 
-        # -------- Fallback (ensure at least one cause) --------
-        if not selected_causes:
-            selected_causes = [causes[0]]
+        # sort by score
+        scores.sort(key=lambda x: x[1], reverse=True)
 
-        # -------- Batch description generation --------
-        descriptions = await generate_descriptions_batch(
-            incident_text,
-            category,
-            selected_causes   # 🔥 LIST (fixes character bug)
-        )
+        # select top causes
+        top_causes = scores[:MAX_CAUSES_PER_CATEGORY]
 
-        # -------- Combine causes + descriptions --------
-        selected = []
+        for cause, score in top_causes:
 
-        for cause, desc in zip(selected_causes, descriptions):
-            selected.append({
-                "cause": cause,
-                "description": desc
+            if score < MIN_SIMILARITY_SCORE:
+                continue
+
+            selected_causes.append({
+                "category": category,
+                "cause": cause
             })
 
-        result[category] = selected
+    # fallback
+    if not selected_causes:
+
+        selected_causes.append({
+            "category": "Process",
+            "cause": "Inadequate Operating Procedure"
+        })
+
+    # generate explanations
+    descriptions = await generate_descriptions_batch(
+        incident_text,
+        selected_causes
+    )
+
+    result = {cat: [] for cat in FISHBONE}
+
+    for item in selected_causes:
+
+        category = item["category"]
+        cause = item["cause"]
+
+        key = f"{category}::{cause}"
+
+        result[category].append({
+            "cause": cause,
+            "description": descriptions.get(
+                key,
+                "Cause not supported by the incident description."
+            )
+        })
 
     return result

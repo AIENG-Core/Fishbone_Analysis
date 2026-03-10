@@ -2,58 +2,65 @@ import ollama
 from config import LLM_MODEL
 
 
-async def generate_descriptions_batch(incident, category, causes):
-
-    # 🔴 Safety check
-    if isinstance(causes, str):
-        causes = [causes]
+async def generate_descriptions_batch(incident, causes):
 
     if not causes:
-        return []
+        return {}
 
-    causes_text = "\n".join(f"{i+1}. {c}" for i, c in enumerate(causes))
+    causes_text = "\n".join(
+        f"{i+1}. {c['category']} — {c['cause']}"
+        for i, c in enumerate(causes)
+    )
 
     prompt = f"""
-You are assisting in an industrial safety Root Cause Analysis.
+You are assisting in an industrial Root Cause Analysis.
 
-Incident:
+Incident description:
 {incident}
 
-Category: {category}
+Possible root causes:
 
-Causes:
 {causes_text}
 
-Write a short neutral description (1 to 2 sentences)
-for EACH cause in order.
+Task:
+Explain briefly how each cause might contribute to the incident.
 
 Rules:
-- No blame
-- No assumptions
-- No new causes
-- Return numbered list only
+- Use incident information if available
+- If the cause is not supported say:
+"Cause not supported by the incident description."
+- Keep explanation to ONE sentence
+- Return numbered list
 """
 
     response = ollama.generate(
         model=LLM_MODEL,
         prompt=prompt,
-        options={"num_predict": 150}
+        options={"num_predict": 200}
     )
 
-    text = response["response"].strip()
+    text = response["response"]
 
-    # Parse numbered output safely
-    lines = [line.strip() for line in text.split("\n") if line.strip()]
+    lines = [
+        line.strip()
+        for line in text.split("\n")
+        if line.strip()
+    ]
 
-    descriptions = []
-    for line in lines:
+    descriptions = {}
+
+    for i, line in enumerate(lines):
+
+        if i >= len(causes):
+            break
+
         if "." in line:
-            descriptions.append(line.split(".", 1)[1].strip())
+            desc = line.split(".", 1)[1].strip()
         else:
-            descriptions.append(line)
+            desc = line
 
-    # Ensure same length as causes
-    while len(descriptions) < len(causes):
-        descriptions.append("")
+        key = f"{causes[i]['category']}::{causes[i]['cause']}"
 
-    return descriptions[:len(causes)]
+        descriptions[key] = desc
+
+    return descriptions
